@@ -75,7 +75,7 @@ class Validation(object):
         if self.tweet_length() > MAX_LENGTH:
             valid, validation_error = False, 'Too long'
 
-        if re.search(ur''.join(REGEXEN['invalid_control_characters']), self.text):
+        if re.search(u''.join(REGEXEN['invalid_control_characters']), self.text):
             valid, validation_error = False, 'Invalid characters'
             
         if self.parent and hasattr(self.parent, 'tweet_is_valid'):
@@ -97,7 +97,7 @@ class Validation(object):
         return len(extracted) == 1 and extracted[0] == self.text[1:]
 
     def valid_list(self):
-        match = re.compile(ur'^%s$' % REGEXEN['valid_mention_or_list'].pattern).search(self.text)
+        match = re.compile(u'^%s$' % REGEXEN['valid_mention_or_list'].pattern).search(self.text)
         return bool(match is not None and match.groups()[0] == "" and match.groups()[3])
 
     def valid_hashtag(self):
@@ -124,7 +124,7 @@ class Validation(object):
                 not require_protocol 
                 or (
                     self._valid_match(scheme, REGEXEN['validate_url_scheme']) 
-                    and re.compile(ur'^https?$', re.IGNORECASE).match(scheme)
+                    and re.compile(u'^https?$', re.IGNORECASE).match(scheme)
                 )
             )
             and (
