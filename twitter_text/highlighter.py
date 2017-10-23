@@ -3,7 +3,6 @@
 import re
 from HTMLParser import HTMLParser
 
-from twitter_text.regex import UNICODE_SPACES
 from twitter_text.unicode import force_unicode
 
 DEFAULT_HIGHLIGHT_TAG = 'em'
