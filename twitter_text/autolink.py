@@ -302,16 +302,16 @@ class Autolink(object):
         For those URLs, display_url is not a substring of expanded_url, so we don't do anything special to render the elided parts.
         For a pic.twitter.com URL, the only elided part will be the "https://", so this is fine.
         """
-        display_url = entity.get('display_url').decode('utf-8')
+        display_url = entity.get('display_url')
         expanded_url = entity.get('expanded_url')
         invisible_tag_attrs = options.get('invisible_tag_attrs', DEFAULT_INVISIBLE_TAG_ATTRS)
 
-        display_url_sans_ellipses = re.sub(ur'…', u'', display_url)
+        display_url_sans_ellipses = re.sub(u'…', u'', display_url)
 
         if expanded_url.find(display_url_sans_ellipses) > -1:
             before_display_url, after_display_url = expanded_url.split(display_url_sans_ellipses, 2)
-            preceding_ellipsis = re.search(ur'\A…', display_url)
-            following_ellipsis = re.search(ur'…\z', display_url)
+            preceding_ellipsis = re.search(u'\\A…', display_url)
+            following_ellipsis = re.search(u'…\\Z', display_url)
             if preceding_ellipsis is not None:
                 preceding_ellipsis = preceding_ellipsis.group()
             else:
