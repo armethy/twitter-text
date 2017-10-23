@@ -1,7 +1,10 @@
 # encoding=utf-8
 
 import re
-from HTMLParser import HTMLParser
+try:
+    from html.parser import HTMLParser
+except ImportError:
+    from HTMLParser import HTMLParser
 
 from twitter_text.unicode import force_unicode
 
