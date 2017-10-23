@@ -113,7 +113,7 @@ class Autolink(object):
             return self.text
 
         # NOTE deprecate these attributes not options keys in options hash, then use html_attrs
-        options = dict(DEFAULT_OPTIONS.items() + options.items())
+        options = dict(list(DEFAULT_OPTIONS.items()) + list(options.items()))
         options['html_attrs'] = self._extract_html_attrs_from_options(options)
         if not options.get('suppress_no_follow', False):
             options['html_attrs']['rel'] = "nofollow"
