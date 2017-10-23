@@ -36,7 +36,7 @@ class HitHighlighter(object):
 
         if not hits and kwargs.get('query'):
             stripped_text   =   strip_tags(self.text)
-            for match in re.finditer(ur'%s' % kwargs.get('query'), stripped_text):
+            for match in re.finditer(u'%s' % kwargs.get('query'), stripped_text):
                 hits.append(match.span())
 
         if hits and not type(hits) == list:
