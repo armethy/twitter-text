@@ -1,5 +1,11 @@
 import types, datetime
 from decimal import Decimal
+try:
+    long
+except NameError:
+    long = int
+    unicode = str
+    basestring = (bytes, str)
 
 # borrowed from django.utils.encoding
 class TwitterTextUnicodeDecodeError(UnicodeDecodeError):
