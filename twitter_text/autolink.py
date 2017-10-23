@@ -1,6 +1,6 @@
 # encoding=utf-8
 
-import re, cgi
+import re
 
 from twitter_text.regex import REGEXEN
 from twitter_text.unicode import force_unicode
