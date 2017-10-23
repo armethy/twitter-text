@@ -60,7 +60,7 @@ class HitHighlighter(object):
                 if index % 2:
                     # we're inside a <tag>
                     continue
-                chunk_start = len(u''.join(text_chunks[0:index / 2]))
+                chunk_start = len(u''.join(text_chunks[0:index // 2]))
                 chunk_end = chunk_start + len(chunk)
                 if hit_start >= chunk_start and hit_start < chunk_end:
                     chunk = chunk[:hit_start - chunk_start] + tags[0] + chunk[hit_start - chunk_start:]
