@@ -38,10 +38,10 @@ except ImportError:
         raise Exception('You need to install BeautifulSoup to run the tests')
 
 def success(text):
-    return (u'\033[92m%s\033[0m\n' % text).encode('utf-8')
+    return (u'\033[92m%s\033[0m\n' % text)
 
 def error(text):
-    return (u'\033[91m%s\033[0m\n' % text).encode('utf-8')
+    return (u'\033[91m%s\033[0m\n' % text)
 
 attempted = 0
 passed = 0
@@ -109,7 +109,7 @@ for section in extractor_tests.get('tests'):
             elif section == 'cashtags_with_indices':
                 assert_equal(extractor.extract_cashtags_with_indices(), test)
         except AssertionError as ae:
-            print(ae.message)
+            print(ae.args[0])
             failed += 1
         else:
             passed += 1
@@ -148,7 +148,7 @@ for section in autolink_tests.get('tests'):
             elif section == 'json':
                 assert_equal_without_attribute_order(autolink.auto_link_with_json(json.loads(test.get('json')), autolink_options), test)
         except AssertionError as ae:
-            print(ae.message)
+            print(ae.args[0])
             failed += 1
         else:
             passed += 1
@@ -176,7 +176,10 @@ validate_tests = None
 try:
     validate_file = open(os.path.join('twitter-text-conformance', 'validate.yml'), 'r')
     validate_file_contents = validate_file.read()
-    validate_tests = yaml.load(re.sub(u'\\\\n', '\n', validate_file_contents.encode('unicode-escape')))
+    validate_tests = yaml.load(
+        re.sub(u'\\\\n', '\n',
+               validate_file_contents.encode('unicode-escape').decode("ascii"))
+    )
     validate_file.close()
 except ValueError:
     sys.stdout.write('\nValidation tests were skipped because of wide character issues\n')
@@ -202,7 +205,7 @@ if validate_tests:
                 elif section == 'urls':
                     assert_equal(validator.valid_url(), test)
             except AssertionError as ae:
-                print(ae.message)
+                print(ae.args[0])
                 failed += 1
             else:
                 passed += 1
