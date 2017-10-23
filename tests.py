@@ -2,6 +2,10 @@
 
 import twitter_text, sys, os, json, argparse, re
 from twitter_text.unicode import force_unicode
+try:
+    unichr
+except NameError:
+    unichr = chr
 
 narrow_build = True
 try:
@@ -40,19 +44,29 @@ def error(text):
     return (u'\033[91m%s\033[0m\n' % text).encode('utf-8')
 
 attempted = 0
+passed = 0
+failed = 0
 
 def assert_equal_without_attribute_order(result, test, failure_message = None):
     global attempted
     attempted += 1
     # Beautiful Soup sorts the attributes for us so we can skip all the hoops the ruby version jumps through
-    assert BeautifulSoup(result) == BeautifulSoup(test.get('expected')), error(u'Test %d Failed: %s' % (attempted, test.get('description')))
+    actual = BeautifulSoup(result)
+    expected = BeautifulSoup(test.get('expected'))
+    assert actual == expected, error(u'Test %d Failed: %s (%s != %s)' % (attempted, test.get('description'),
+                                                                         actual, expected))
     sys.stdout.write(success(u'Test %d Passed: %s' % (attempted, test.get('description'))))
     sys.stdout.flush()
 
 def assert_equal(result, test):
     global attempted
     attempted += 1
-    assert result == test.get('expected'), error(u'\nTest %d Failed: %s%s' % (attempted, test.get('description'), u'\n%s' % test.get('hits') if test.get('hits') else ''))
+    expected = test.get('expected')
+    assert result == expected, error(u'\nTest %d Failed: %s%s (%s != %s)' % (
+        attempted, test.get('description'),
+        u'\n%s' % test.get('hits') if test.get('hits') else '',
+        result, expected
+    ))
     sys.stdout.write(success(u'Test %d Passed: %s' % (attempted, test.get('description'))))
     sys.stdout.flush()
 
@@ -72,27 +86,33 @@ for section in extractor_tests.get('tests'):
             sys.stdout.write('Skipping: %s\n' % test.get('description'))
             sys.stdout.flush()
             continue
-        extractor = twitter_text.extractor.Extractor(test.get('text'))
-        if section == 'mentions':
-            assert_equal(extractor.extract_mentioned_screen_names(), test)
-        elif section == 'mentions_with_indices':
-            assert_equal(extractor.extract_mentioned_screen_names_with_indices(), test)
-        elif section == 'mentions_or_lists_with_indices':
-            assert_equal(extractor.extract_mentions_or_lists_with_indices(), test)
-        elif section == 'replies':
-            assert_equal(extractor.extract_reply_screen_name(), test)
-        elif section == 'urls':
-            assert_equal(extractor.extract_urls(), test)
-        elif section == 'urls_with_indices':
-            assert_equal(extractor.extract_urls_with_indices(), test)
-        elif section == 'hashtags':
-            assert_equal(extractor.extract_hashtags(), test)
-        elif section == 'cashtags':
-            assert_equal(extractor.extract_cashtags(), test)
-        elif section == 'hashtags_with_indices':
-            assert_equal(extractor.extract_hashtags_with_indices(), test)
-        elif section == 'cashtags_with_indices':
-            assert_equal(extractor.extract_cashtags_with_indices(), test)
+        try:
+            extractor = twitter_text.extractor.Extractor(test.get('text'))
+            if section == 'mentions':
+                assert_equal(extractor.extract_mentioned_screen_names(), test)
+            elif section == 'mentions_with_indices':
+                assert_equal(extractor.extract_mentioned_screen_names_with_indices(), test)
+            elif section == 'mentions_or_lists_with_indices':
+                assert_equal(extractor.extract_mentions_or_lists_with_indices(), test)
+            elif section == 'replies':
+                assert_equal(extractor.extract_reply_screen_name(), test)
+            elif section == 'urls':
+                assert_equal(extractor.extract_urls(), test)
+            elif section == 'urls_with_indices':
+                assert_equal(extractor.extract_urls_with_indices(), test)
+            elif section == 'hashtags':
+                assert_equal(extractor.extract_hashtags(), test)
+            elif section == 'cashtags':
+                assert_equal(extractor.extract_cashtags(), test)
+            elif section == 'hashtags_with_indices':
+                assert_equal(extractor.extract_hashtags_with_indices(), test)
+            elif section == 'cashtags_with_indices':
+                assert_equal(extractor.extract_cashtags_with_indices(), test)
+        except AssertionError as ae:
+            print(ae.message)
+            failed += 1
+        else:
+            passed += 1
 
 # autolink section
 autolink_file = open(os.path.join('twitter-text-conformance', 'autolink.yml'), 'r')
@@ -112,20 +132,26 @@ for section in autolink_tests.get('tests'):
             sys.stdout.flush()
             continue
         autolink = twitter_text.autolink.Autolink(test.get('text'))
-        if section == 'usernames':
-            assert_equal_without_attribute_order(autolink.auto_link_usernames_or_lists(autolink_options), test)
-        elif section == 'cashtags':
-            assert_equal_without_attribute_order(autolink.auto_link_cashtags(autolink_options), test)
-        elif section == 'urls':
-            assert_equal_without_attribute_order(autolink.auto_link_urls(autolink_options), test)
-        elif section == 'hashtags':
-            assert_equal_without_attribute_order(autolink.auto_link_hashtags(autolink_options), test)
-        elif section == 'all':
-            assert_equal_without_attribute_order(autolink.auto_link(autolink_options), test)
-        elif section == 'lists':
-            assert_equal_without_attribute_order(autolink.auto_link_usernames_or_lists(autolink_options), test)
-        elif section == 'json':
-            assert_equal_without_attribute_order(autolink.auto_link_with_json(json.loads(test.get('json')), autolink_options), test)
+        try:
+            if section == 'usernames':
+                assert_equal_without_attribute_order(autolink.auto_link_usernames_or_lists(autolink_options), test)
+            elif section == 'cashtags':
+                assert_equal_without_attribute_order(autolink.auto_link_cashtags(autolink_options), test)
+            elif section == 'urls':
+                assert_equal_without_attribute_order(autolink.auto_link_urls(autolink_options), test)
+            elif section == 'hashtags':
+                assert_equal_without_attribute_order(autolink.auto_link_hashtags(autolink_options), test)
+            elif section == 'all':
+                assert_equal_without_attribute_order(autolink.auto_link(autolink_options), test)
+            elif section == 'lists':
+                assert_equal_without_attribute_order(autolink.auto_link_usernames_or_lists(autolink_options), test)
+            elif section == 'json':
+                assert_equal_without_attribute_order(autolink.auto_link_with_json(json.loads(test.get('json')), autolink_options), test)
+        except AssertionError as ae:
+            print(ae.message)
+            failed += 1
+        else:
+            passed += 1
 
 # hit_highlighting section
 hit_highlighting_file = open(os.path.join('twitter-text-conformance', 'hit_highlighting.yml'), 'r')
@@ -150,7 +176,7 @@ validate_tests = None
 try:
     validate_file = open(os.path.join('twitter-text-conformance', 'validate.yml'), 'r')
     validate_file_contents = validate_file.read()
-    validate_tests = yaml.load(re.sub(ur'\\n', '\n', validate_file_contents.encode('unicode-escape')))
+    validate_tests = yaml.load(re.sub(u'\\\\n', '\n', validate_file_contents.encode('unicode-escape')))
     validate_file.close()
 except ValueError:
     sys.stdout.write('\nValidation tests were skipped because of wide character issues\n')
@@ -164,17 +190,24 @@ if validate_tests:
         sys.stdout.write('\nTesting Validation: %s\n' % section)
         for test in validate_tests.get('tests').get(section):
             validator = twitter_text.validation.Validation(test.get('text'))
-            if section == 'tweets':
-                assert_equal(not validator.tweet_invalid(), test)
-            elif section == 'usernames':
-                assert_equal(validator.valid_username(), test)
-            elif section == 'lists':
-                assert_equal(validator.valid_list(), test)
-            elif section == 'hashtags':
-                assert_equal(validator.valid_hashtag(), test)
-            elif section == 'urls':
-                assert_equal(validator.valid_url(), test)
+            try:
+                if section == 'tweets':
+                    assert_equal(not validator.tweet_invalid(), test)
+                elif section == 'usernames':
+                    assert_equal(validator.valid_username(), test)
+                elif section == 'lists':
+                    assert_equal(validator.valid_list(), test)
+                elif section == 'hashtags':
+                    assert_equal(validator.valid_hashtag(), test)
+                elif section == 'urls':
+                    assert_equal(validator.valid_url(), test)
+            except AssertionError as ae:
+                print(ae.message)
+                failed += 1
+            else:
+                passed += 1
 
-sys.stdout.write(u'\033[0m-------\n\033[92m%d tests passed.\033[0m\n' % attempted)
+sys.stdout.write(u'\033[0m-------\n\033[92m%d tests passed%s.\033[0m\n' %
+                 (passed, (error(", %d failed" % failed) if failed else "")))
 sys.stdout.flush()
-sys.exit(os.EX_OK)
+sys.exit(os.EX_OK if not failed else os.EX_SOFTWARE)
