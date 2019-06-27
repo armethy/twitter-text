@@ -1,11 +1,38 @@
+os:
+  - osx
+  - linux
+
+branches:
+  only:
+  - master
+
 before_install:
-  - brew install libidn
-language: objective-c
-os: osx
+  # help: https://docs.travis-ci.com/user/multi-os/
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install libidn; fi
+
 matrix:
   include:
-    - env: TWITTER_TEXT_DIR=rb
-      rvm: 2.4.2
-    - env: TWITTER_TEXT_DIR=java
-    - env: TWITTER_TEXT_DIR=objc
+    - language: ruby
+        env: TWITTER_TEXT_DIR=rb
+        rvm: 2.4.2
+    - language: java
+        env: TWITTER_TEXT_DIR=java
+    - language: objective-c
+        env: TWITTER_TEXT_DIR=objc
+    - language: python
+        # help: https://docs.travis-ci.com/user/languages/python/
+        env: TWITTER_TEXT_DIR=py
+        python:
+          - "2.7"
+          - "3.5"
+	  - "pypy3.5"
+        install:
+          - "pip install -r ./$TWITTER_TEXT_DIR/requirements.txt --use-mirrors"
+	  # PyPy
+          - "pip install ./$TWITTER_TEXT_DIR --use-mirrors"
+        script: "python ./$TWITTER_TEXT_DIR/tests/tests.py"
+
 script: "./.travis.sh"
+
+notifications:
+  email: false

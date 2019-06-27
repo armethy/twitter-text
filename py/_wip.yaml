@@ -1,0 +1,45 @@
+Py integration:
+  Travis:
+    DONE:
+    - added Py support
+    - fixed up some build lifecycle items (os, before_install)
+    PENDING:
+    - integrate shell script into .travis.yml:
+      - reasoning: is reduntant
+    - Py support not tested
+  Py version support (.travis.yml):
+    DONE:
+    - deprecated 2.6:
+      - reasoning: too old
+    - added 3.5:
+      - reasoning: 
+        - current Py3 version in Debian stretch
+    - added PyPy3.5:
+      - reasoning: saw supported pip command but not corresponding version in CI definition
+  Py implementation:
+    DONE:
+    - merged repos (used --allow-unrelated-histories)
+    - removed old conformance submodule:
+      - reasoning: 
+        - not required anymore; original submodule was forked from twitter_s own conformance suite
+    PENDING:
+    - examine fork(s) for any missing additions:
+      - dryan/twitter-conformance
+      - etc. (search github, gitlab)
+  Licensing:
+    DONE:
+    - root maintains original Apache license [DONE]
+    - ./py maintains original authors' license
+    PENDING:
+    - change setup.cfg to reflect license correctly
+    - update ./py authors' license to be conformant to root
+  Testing:
+    PENDING: research TBD (tox, etc.)
+  Git:
+    DONE:
+    - updated .gitignore
+    PENDING:
+    - update .gitattributes
+    - research if gh-pages needs to be merged
+  Docs:
+    PENDING: update README of ./py and root

@@ -2,7 +2,21 @@
 js/.idea
 rb/.idea
 java/.idea
+py/.idea
 /.idea
 twitter-text.iml
+
+# os
 .DS_Store
 *.sw?
+
+# Python specific
+*.py[cod]
+build/
+*.egg*
+dist/
+__pycache__/
+.env
+.venv
+env*/
+venv*/

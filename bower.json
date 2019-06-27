@@ -5,6 +5,7 @@
     "conformance/*",
     "java/*",
     "objc/*",
-    "rb/*"
+    "rb/*",
+    "py/*"
   ]
 }
